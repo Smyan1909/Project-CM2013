@@ -16,7 +16,7 @@ figure(1);
 for i=1:size(record,1)
     Fs = hdr.samples(i);
     (length(record(i,:)')/Fs);
-    epochNumber = 1; % plot nth epoch of 30 seconds
+    epochNumber = 2; % plot nth epoch of 30 seconds
     epochStart = (epochNumber*Fs*30);
     epochEnd = epochStart + 30*Fs;
     subplot(size(record,1),1,i);
