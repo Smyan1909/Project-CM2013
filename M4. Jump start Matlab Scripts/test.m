@@ -15,8 +15,8 @@ numberOfEpochs = length(record(3,:)')/(30*hdr.samples(3))
 figure(1);
 for i=1:size(record,1)
     Fs = hdr.samples(i);
-    (length(record(i,:)')/Fs);
-    epochNumber = 2; % plot nth epoch of 30 seconds
+    %(length(record(i,:)')/Fs);
+    epochNumber = 1; % plot nth epoch of 30 seconds
     epochStart = (epochNumber*Fs*30);
     epochEnd = epochStart + 30*Fs;
     subplot(size(record,1),1,i);
@@ -39,3 +39,13 @@ ylabel('Sleep Stage');
 box off;
 title('Hypnogram');
 set(gcf,'color','w');
+%% plotting one epoch of an ECG signal
+figure(3);
+F_ecg_signal = hdr.samples(4);
+epoch_ecg_start = (epochNumber*F_ecg_signal*30);
+epoch_ecg_end = epoch_ecg_start + 30*F_ecg_signal;
+ecg_signal = record(4, epoch_ecg_start:epoch_ecg_end);
+plot((1:length(ecg_signal))/F_ecg_signal, ecg_signal);
+xlim([1 30]);
+
+
