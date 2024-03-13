@@ -34,7 +34,7 @@ grid on
 
 epoch_ecg_start = (epoch_Number*Fs*30);
 epoch_ecg_end = epoch_ecg_start + 30*Fs;
-ecg_signal= -record(4, epoch_ecg_start:epoch_ecg_end);
+ecg_signal= -record(signal_number, epoch_ecg_start:epoch_ecg_end);
 plot((1:length(ecg_signal))/Fs, ecg_signal);
 xlim([1 30]);
 
