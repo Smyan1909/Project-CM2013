@@ -85,3 +85,15 @@ nexttile
 plot((1:length(ecg_signal))/Fs, ecg_denoised)
 title("Filtered ECG signal")
 xlim([1 30]);
+
+figure
+tiledlayout(2,1)
+nexttile
+plot(f, pxx)
+title("Unfiltered power spectrum")
+xlim([0 Fs/2]);
+nexttile
+[pxx2,f2] = pwelch(ecg_signal,[],[],[],Fs);
+plot(f2, pxx2)
+title("Filtered power spectrum")
+xlim([0 Fs/2])
