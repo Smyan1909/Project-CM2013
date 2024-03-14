@@ -11,19 +11,23 @@ xmlFilename = 'Project Data/R4.xml';
 %%
 numberOfEpochs = length(record(3,:)')/(30*hdr.samples(3))
 
-%% plot 1 30 sec epoch of each signal
-figure(1);
-for i=1:size(record,1)
+%% plot 1 30 sec epoch of EOG channels only
+f = figure();
+
+whichAreEOGs = find(contains(hdr.label, 'EOG'));
+
+for i = whichAreEOGs
+    disp(i)
     Fs = hdr.samples(i);
     (length(record(i,:)')/Fs);
     epochNumber = 2; % plot nth epoch of 30 seconds
     epochStart = (epochNumber*Fs*30);
     epochEnd = epochStart + 30*Fs;
-    subplot(size(record,1),1,i);
-    signal = record(i,epochStart:epochEnd);
-    plot((1:length(signal))/Fs,signal);
-    ylabel(hdr.label(i));
-    xlim([1 30]);
+    subplot(length(whichAreEOGs),1,i);
+    % signal = record(i,epochStart:epochEnd);
+    % plot((1:length(signal))/Fs,signal);
+    % ylabel(hdr.label(i));
+    % xlim([1 30]);
 end
 sgtitle(['30 seconds epoch #' num2str(epochNumber)]);
 set(gcf,'color','w');
