@@ -9,25 +9,31 @@ xmlFilename = 'Project Data/R4.xml';
 [hdr, record] = edfread(edfFilename);
 [events, stages, epochLength,annotation] = readXML(xmlFilename);
 %%
-numberOfEpochs = length(record(3,:)')/(30*hdr.samples(3))
+numberOfEpochs = length(record(3,:)')/(30*hdr.samples(3));
 
 %% plot 1 30 sec epoch of EOG channels only
-f = figure();
+
 
 whichAreEOGs = find(contains(hdr.label, 'EOG'));
 
+% Plotting initialization
+f = figure();
+tlay = tiledlayout(2, 1);
+
 for i = whichAreEOGs
-    disp(i)
+    %disp(i)
+    
     Fs = hdr.samples(i);
-    (length(record(i,:)')/Fs);
+    durationSecs = (length(record(i,:))/Fs);
     epochNumber = 2; % plot nth epoch of 30 seconds
     epochStart = (epochNumber*Fs*30);
     epochEnd = epochStart + 30*Fs;
-    subplot(length(whichAreEOGs),1,i);
-    % signal = record(i,epochStart:epochEnd);
-    % plot((1:length(signal))/Fs,signal);
-    % ylabel(hdr.label(i));
-    % xlim([1 30]);
+    signal = record(i,epochStart:epochEnd);
+    nexttile();
+    plot((1:length(signal))/Fs, signal);
+    ylabel(hdr.label(i));
+    xlim([1, 30]);
+    set(gca(), "XMinorTick", "on", "YMinorTick", "on")
 end
 sgtitle(['30 seconds epoch #' num2str(epochNumber)]);
 set(gcf,'color','w');
