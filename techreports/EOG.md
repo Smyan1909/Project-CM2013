@@ -1,3 +1,3 @@
-EOG: <b>e</b>lectro<b>o</b>culo<b>g</b>rapghy
-=============================================
+EOG: <strong>e</strong>lectro<strong>o</strong>culo<strong>g</strong>raphy
+==========================================================================
 
