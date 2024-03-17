@@ -5,3 +5,5 @@ R2.edf	6	13794.16	13799.55		Saturation high amp
 R2.edf	7	13784.0	13799.22		High amplitude
 R2.edf	6	13804.66	13811.98		Normal
 R2.edf	7	13826.0	NA		Saturation high amp
+R2.edf	7	0.0	NA		Whole channel EOGR
+R2.edf	6	0.0	NA		Whole channel EOGL
