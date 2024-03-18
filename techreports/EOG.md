@@ -80,11 +80,28 @@ How many seconds (samples) to average over is an open question, nonetheless,
 however for smoothness it would seem reasonable to have a window of at least several
 seconds.
 
-### 2.2 EEG in EOG
-The EOG signal is very likely contaminated with frontal EEG to some extent (Iwasaki et al. 2004).
+### 2.2 Interference from EEG and EMG
+The EOG signal is very likely contaminated with frontal EEG to some extent (Iwasaki et al. 2004),
+as well as presumably EMG.
 The problem here is that the EOG channels cannot record this faithfully,
 given that the **sampling frequency is just 50 Hz**.
 
 This means that the signal has already been effectively low pass filtered, or worse,
 contaminated by aliasing. Trying to filter out high frequency components at this stage
-is futile. 
+is futile.
+
+**Proposed filtering strategy:** median filter (`medfilt1` in MATLAB) with *n* = 3,
+perhaps *n* = 5 to remove potential outlier peaks while not distorting the waveform.
+
+
+3 Feature selection and generation
+----------------------------------
+### Moving average of absolute signal
+Introducing nonlinearity by taking the absolute value means that periodic
+artefact signals do not cancel out to 0 mean. This could alternatively
+be
+
+
+### Continuous wavelet transform
+Tao (2023) remarks that the relevant elements of EOG are non-periodic,
+hence wavelet analysis is preferable to Fourier transform-based methods.
