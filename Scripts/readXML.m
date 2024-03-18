@@ -65,7 +65,10 @@ if events.getLength>0
             if events.item(i).getElementsByTagName('Text').getLength > 0
                 text = char(events.item(i).getElementsByTagName('Text').item(0).getTextContent);
             end
-            eventStruct = struct('EventConcept',name, 'Start',starttime,'Duration',duration,'Desaturation',baseline,'SpO2Nadir',nadir,'Text',text);
+            if events.item(i).getElementsByTagName('Notes').getLength > 0
+                text = char(events.item(i).getElementsByTagName('Notes').item(0).getTextContent);
+            end
+            eventStruct = struct('EventConcept',name, 'Start',starttime,'Duration',duration,'Desaturation',baseline,'SpO2Nadir',nadir,'Text',text,'Notes',notes);
             
             %        if ~isempty(strfind(stagesConcept,name))
             if strcmp(stagesConcept{1},name)==1
