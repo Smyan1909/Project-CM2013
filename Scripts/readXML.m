@@ -56,6 +56,7 @@ if events.getLength>0
             baseline = 0;
             nadir = 0;
             text = char('');
+            notes = '';
             if events.item(i).getElementsByTagName('Desaturation').getLength>0
                 baseline = str2num(events.item(i).getElementsByTagName('Desaturation').item(0).getTextContent);
             end
@@ -66,7 +67,7 @@ if events.getLength>0
                 text = char(events.item(i).getElementsByTagName('Text').item(0).getTextContent);
             end
             if events.item(i).getElementsByTagName('Notes').getLength > 0
-                text = char(events.item(i).getElementsByTagName('Notes').item(0).getTextContent);
+                notes = char(events.item(i).getElementsByTagName('Notes').item(0).getTextContent);
             end
             eventStruct = struct('EventConcept',name, 'Start',starttime,'Duration',duration,'Desaturation',baseline,'SpO2Nadir',nadir,'Text',text,'Notes',notes);
             

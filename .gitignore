@@ -29,3 +29,6 @@ codegen/
 
 # Octave session info
 octave-workspace
+
+# Path definition file, generated with MATLAB's pathsave
+pathdef.m
