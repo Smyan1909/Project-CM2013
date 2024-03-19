@@ -85,6 +85,8 @@ The EOG signal is very likely contaminated with frontal EEG to some extent (Iwas
 as well as presumably EMG.
 The problem here is that the EOG channels cannot record this faithfully,
 given that the **sampling frequency is just 50 Hz**.
+Even some frequencies that are expected in EOG (up to 50 Hz, according to Tao et al. 2023)
+must be filtered out before recording or will lead to aliasing.
 
 This means that the signal has already been effectively low pass filtered, or worse,
 contaminated by aliasing. Trying to filter out high frequency components at this stage
