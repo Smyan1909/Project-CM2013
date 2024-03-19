@@ -4,7 +4,7 @@ close all;
 clear all;
 
 %% load edf and xml files
-edfFilename = 'Project Data/R4.edf';
+edfFilename = 'Project Data (modified dates)/R4.edf';
 xmlFilename = 'Project Data/R4.xml';
 [hdr, record] = edfread(edfFilename);
 [events, stages, epochLength,annotation] = readXML(xmlFilename);
