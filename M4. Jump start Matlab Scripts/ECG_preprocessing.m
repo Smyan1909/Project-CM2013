@@ -7,7 +7,7 @@ edfFileName = 'Project Data/R3.edf';
 
 numberOfEpochs = length(record(3,:)')/(30*hdr.samples(3))
 
-epoch_Number = 1;
+epoch_Number = 6;
 
 signal_number = 4;
 
@@ -16,7 +16,18 @@ Fs = hdr.samples(signal_number);
 ecg_signal = -record(signal_number, :);
 plot((1:length(ecg_signal))/Fs, ecg_signal);
 
+
+
 %%
+
+epoch_ecg_start = (epoch_Number*Fs*30);
+epoch_ecg_end = epoch_ecg_start + 30*Fs;
+ecg_signal= -record(signal_number, epoch_ecg_start:epoch_ecg_end);
+plot((1:length(ecg_signal))/Fs, ecg_signal);
+xlim([1 30]);
+
+%% Frequency analysis
+
 window = hamming(floor(length(ecg_signal)/8));
 noverlap = floor(length(window)/2);
 nfft = [];
@@ -29,14 +40,6 @@ xlabel('Frequency (Hz)')
 ylabel('Power/Frequency (Mag/Hz)')
 title('Power Spectral Density using Welch''s Method')
 grid on
-
-%%
-
-epoch_ecg_start = (epoch_Number*Fs*30);
-epoch_ecg_end = epoch_ecg_start + 30*Fs;
-ecg_signal= -record(signal_number, epoch_ecg_start:epoch_ecg_end);
-plot((1:length(ecg_signal))/Fs, ecg_signal);
-xlim([1 30]);
 
 %% Wavelet Filtering
 levels = 6; 
@@ -97,3 +100,25 @@ nexttile
 plot(f2, pxx2)
 title("Filtered power spectrum")
 xlim([0 Fs/2])
+%% Calculate HRV
+[peaks, peak_locs] = findpeaks(ecg_denoised, 'MinPeakHeight', 0.6*max(ecg_denoised));
+figure
+plot((1:length(ecg_signal))/Fs, ecg_denoised);
+xlim([1 30]);
+hold on
+plot(peak_locs/Fs, peaks, 'ro', 'MarkerSize',10);
+xlabel('Time (s)');
+ylabel('Amplitude');
+legend('ECG Signal', 'Peaks');
+
+% Compute time differences between successive R-peaks
+rr_intervals = diff(peak_locs) / Fs;  % Convert peak locations to time (in seconds)
+
+% Compute squared differences of successive RR intervals
+squared_diff = diff(rr_intervals).^2;
+
+% Compute RMSSD
+rmssd = sqrt(mean(squared_diff));
+
+% Display RMSSD
+disp(['RMSSD: ', num2str(rmssd), ' seconds']);
