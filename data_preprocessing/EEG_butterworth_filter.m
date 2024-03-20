@@ -10,9 +10,9 @@ function Hd = EEG_butterworth_filter
 % All frequency values are in Hz.
 Fs = 125;  % Sampling Frequency
 
-N   = 20;    % Order
+N   = 10;    % Order
 Fc1 = 0.05;  % First Cutoff Frequency
-Fc2 = 3;     % Second Cutoff Frequency
+Fc2 = 4;     % Second Cutoff Frequency
 
 % Construct an FDESIGN object and call its BUTTER method.
 h  = fdesign.bandpass('N,F3dB1,F3dB2', N, Fc1, Fc2, Fs);

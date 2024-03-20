@@ -32,3 +32,4 @@ octave-workspace
 
 # Path definition file, generated with MATLAB's pathsave
 pathdef.m
+startup.m
