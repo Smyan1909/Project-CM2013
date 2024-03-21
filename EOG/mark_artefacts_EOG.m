@@ -12,11 +12,12 @@ markedSignal = signal;
 marks = tabulate_artefacts_EOG(signal, fs, true);
 
 for sigNum = 1:size(signal, 1)
-    channelData = signal(sigNum, :);
-    for epochNum = 1:length(marks)
-        sigptr = 1:epochSampleLen:length(signal)
-        if TODO
-            markedSignal(sigNum, sigptr:(sigptr + epochSampleLen)) = NaN;
+    for epochNum = 0:(size(marks, 2) - 1)
+        % Beware trickery with 0 and 1-based indexing, which must be
+        % constantly interchanged here.
+        epochRange = (1 + epochNum * epochSampleLen) : ((epochNum + 1) * epochSampleLen - 1);
+        if marks(sigNum, epochNum + 1)
+            markedSignal(sigNum, epochRange) = NaN;
         end
     end
 
