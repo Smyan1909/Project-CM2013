@@ -1,6 +1,8 @@
-function [header, record] = load_EOG(fileNo, whichSide)
+function [header, signals] = load_EOG(fileNo, whichSide)
 %load_EOG Convenience function to load EOG signals only.
-%  
+%
+%   [header, signals] = load_EOG(fileNo)
+%       Load the 
 arguments
     fileNo int32
     whichSide char = ''
@@ -27,5 +29,5 @@ else
         numel(whichToLoad));
 end
 
-[header, record] = edfread(edf_filename, 'targetSignals', whichToLoad);
+[header, signals] = edfread(edf_filename, 'targetSignals', whichToLoad);
 end
