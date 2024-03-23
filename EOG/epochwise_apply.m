@@ -9,15 +9,14 @@ function table = epochwise_apply(signal, fs, func, outputTable, epochLenOverride
 %
 %   array_or_table = epochwise_apply(___, epochLenOverride)
 %
-%   In the first form, generate an array of 
 %
-%
+
 arguments
     signal (:,:) double
-    fs (1, 1) double % Our dataset has a 50 Hz sampling rate for EOG signals.
+    fs (1, 1) double {mustBePositive} % Our dataset has a 50 Hz sampling rate for EOG signals.
     func function_handle
     outputTable logical = false
-    epochLenOverride int32 = 0
+    epochLenOverride int32 {mustBeNonnegative,mustBeInteger} = 0
 end
 
 if epochLenOverride > 0
@@ -25,6 +24,8 @@ if epochLenOverride > 0
 else
     epochSampleLen = fs * 30; % Work on 30 s epochs, in line with AASM manual.
 end
+
+mustBeInteger(epochSampleLen);
 
 epochMeasures = NaN([ ...
     size(signal, 1), ...
