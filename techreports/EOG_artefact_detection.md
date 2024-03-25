@@ -33,4 +33,6 @@ elements.
    variable can be easily collapsed into a separate category of "sleep stage".
 2. *(potentially)* self-supervised learning in a crude way by using this to automatically find other epochs that look
 "artefact-like", then correct the labels manually as fit to broaden the training set.
-3. Exclusion of artefact-marked regions from use for sleep stage prediction – at least as long as the ML method used can tolerate missing data.
+3. Exclusion of artefact-marked regions from use for sleep stage prediction
+– at least as long as the ML method used can tolerate missing data.
+

@@ -1,4 +1,4 @@
 clear all;
 
-[header, signals] = load_EOG(5);
-[] = readXML()
+[header, signals, epochinfo] = load_EOG(5);
+%[] = readXML()

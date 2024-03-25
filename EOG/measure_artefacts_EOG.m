@@ -1,6 +1,5 @@
-function measureArray = measure_artefacts_EOG(signal, fs)
-%tabulate_artefacts_EOG Generate a table (or an array) listing epochs where
-%artefacts have been found. Intended for use with EOG signal channels.
+function measureArray = measure_artefacts_EOG(signal, fs, outputArray)
+%tabulate_artefacts_EOG Generate a table (or an array) listing epochs where artefacts have been found. Intended for use with EOG signal channels.
 %
 %   table = tabulate_artefacts_EOG(signal)
 %

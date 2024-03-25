@@ -1,4 +1,4 @@
-function [header, signals] = load_EOG(fileNo, whichSide)
+function [header, signals, epochInfo] = load_EOG(fileNo, whichSide)
 %load_EOG Convenience function to load EOG signals only.
 %
 %   [header, signals] = load_EOG(fileNo)
@@ -30,4 +30,9 @@ else
 end
 
 [header, signals] = edfread(edf_filename, 'targetSignals', whichToLoad);
+if nargout == 3
+    epochInfo = struct();
+    [epochInfo.events, epochInfo.stages, epochInfo.epochLength, ...
+        epochInfo.annotation] = readXML(xml_filename);
+end
 end
