@@ -1,18 +1,22 @@
-function table = epochwise_apply(signal, fs, func, outputArray, epochLenOverride)
-%tabulate_artefacts_EOG Generate a table (or an array) listing epochs where
-%artefacts have been found. Intended for use with EOG signal channels.
+function table = epochwise_apply(signal, fs, func, outputTable, epochLenOverride)
+%epochwise_apply Apply a function that calculates a single value
+% to each epoch-channel combination and return the results as an array or
+% timetable.
 %
-%   table = tabulate_artefacts_EOG(signal)
+%   array = epochwise_apply(signal, fs, func)
 %
-%   table = tabulate_artefacts_EOG(signal, fs)
+%   table = epochwise_apply(signal, fs, func, true)
 %
-%   table = tabulate_artefacts_EOG(signal, fs, outputArray)
+%   array_or_table = epochwise_apply(___, epochLenOverride)
+%
+%
+
 arguments
     signal (:,:) double
-    fs double % Our dataset has a 50 Hz sampling rate for EOG signals.
+    fs (1, 1) double {mustBePositive} % Our dataset has a 50 Hz sampling rate for EOG signals.
     func function_handle
-    outputArray logical = false
-    epochLenOverride int32 = 0
+    outputTable logical = false
+    epochLenOverride int32 {mustBeNonnegative,mustBeInteger} = 0
 end
 
 if epochLenOverride > 0
@@ -21,23 +25,25 @@ else
     epochSampleLen = fs * 30; % Work on 30 s epochs, in line with AASM manual.
 end
 
-artefactMarks = false([ ...
+mustBeInteger(epochSampleLen);
+
+epochMeasures = NaN([ ...
     size(signal, 1), ...
     floor(length(signal) / epochSampleLen) ...
    ]);
 
 for sigNum = 1:size(signal, 1)
     channelData = signal(sigNum, :);
-    for epochNum = 0:(size(artefactMarks, 2) - 1)
+    for epochNum = 0:(size(epochMeasures, 2) - 1)
         sigRange = (1 + epochNum * epochSampleLen) : ((epochNum + 1) * epochSampleLen - 1);
-        artefactMarks(sigNum, epochNum + 1) = is_artefact_EOG_epchan(channelData(sigRange));
+        epochMeasures(sigNum, epochNum + 1) = func(channelData(sigRange));
     end
 end
 
-if outputArray
-    table = artefactMarks;
+if outputTable
+    table = timetable(epochMeasures', TimeStep=seconds(30));
 else
-    table = timetable(artefactMarks', TimeStep=seconds(30));
+    table = epochMeasures;
 end
 
 end
