@@ -4,7 +4,7 @@ edfFileName = 'Project Data/R4.edf';
 
 numberOfEpochs = length(record(3,:)')/(30*hdr.samples(3))
 
-epoch_Number = 195; %K-complex exists at epoch_Number 195 and at 126 and at 613 and at 83 and at 747
+epoch_Number = 196; %K-complex exists at epoch_Number 195 and at 126 and at 613 and at 83 and at 747
 
 signal_number = 8;
 
@@ -18,7 +18,9 @@ plot((1:length(eeg_signal))/Fs, eeg_signal);
 xlim([1 30]);
 %% Filter the EEG signal
 Hd = EEG_butterworth_filter;
-eeg_filtered = filter(Hd, eeg_signal);
+Hd2 = filter_eeg;
+eeg_preprocess = filter(Hd2, eeg_signal);
+eeg_filtered = filter(Hd, eeg_preprocess);
 figure
 plot((1:length(eeg_signal))/Fs, eeg_filtered);
 xlim([1 30]);
@@ -74,3 +76,5 @@ for i=1:length(exceed_threshold_locs)
     end
 
 end
+
+k_complex_exist = length(k_complex_indice_start) >= 1;
