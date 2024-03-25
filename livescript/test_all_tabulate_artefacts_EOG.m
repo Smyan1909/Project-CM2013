@@ -22,7 +22,8 @@ for i = 4:7
         colormap(COLORMAPS{j});
         plot(t_secs, signals(j, :));
 
-        isartefactArray = (measures(j,:) >= THRESH_MIN) & (measures(j,:) <= THRESH_MAX);
+        isartefactArray = (measures(j,:) >= THRESH_MIN) & ...
+            (measures(j,:) <= THRESH_MAX);
 
         scatterColors = zeros(length(isartefactArray), 1);
         %scatterColors(isartefactArray, 1) = 1.0;
