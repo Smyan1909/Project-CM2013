@@ -4,7 +4,7 @@ edfFileName = 'Project Data/R4.edf';
 
 numberOfEpochs = length(record(3,:)')/(30*hdr.samples(3))
 
-epoch_Number = 196; %K-complex exists at epoch_Number 195 and at 126 and at 613 and at 83 and at 747
+epoch_Number = 195; %K-complex exists at epoch_Number 195 and at 126 and at 613 and at 83 and at 747
 
 signal_number = 8;
 
@@ -62,7 +62,7 @@ exceed_threshold_locs = [];
 for i=1:length(all_peak_locs)-1
     if eeg_filtered(all_peak_locs(i)) > 0 && eeg_filtered(all_peak_locs(i+1)) < 0
         if abs(eeg_filtered(all_peak_locs(i+1)) - eeg_filtered(all_peak_locs(i))) >= 65
-            exceed_threshold_locs = [exceed_threshold_locs, i]
+            exceed_threshold_locs = [exceed_threshold_locs, i];
         end
     end 
 end
@@ -72,9 +72,9 @@ k_complex_indice_start = [];
 for i=1:length(exceed_threshold_locs)
     
     if abs(all_peak_locs(exceed_threshold_locs(i)-1)/Fs - all_peak_locs(exceed_threshold_locs(i)+2)/Fs) >= 1.2 && abs(all_peak_locs(exceed_threshold_locs(i)-1)/Fs - all_peak_locs(exceed_threshold_locs(i)+2)/Fs) <= 1.5
-        k_complex_indice_start = [k_complex_indice_start, all_peak_locs(exceed_threshold_locs(i)-1)]
+        k_complex_indice_start = [k_complex_indice_start, all_peak_locs(exceed_threshold_locs(i)-1)];
     end
 
 end
 
-k_complex_exist = length(k_complex_indice_start) >= 1;
+k_complex_exist = length(k_complex_indice_start) >= 1
