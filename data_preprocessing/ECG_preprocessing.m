@@ -1,3 +1,5 @@
+%This is a test file and NOT the file used for preprocessing the ECG signal
+
 clc;
 close all;
 clear all;

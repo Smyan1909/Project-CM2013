@@ -3,7 +3,7 @@ edfFileName = 'Project Data/R4.edf';
 
 numberOfEpochs = length(record(3,:)')/(30*hdr.samples(3))
 
-epoch_Number = 83; %K-complex exists at epoch_Number 195 and at 126 and at 613 and at 83 and at 747
+epoch_Number = 195; %K-complex exists at epoch_Number 195 and at 126 and at 613 and at 83 and at 747
 
 signal_number = 8;
 
