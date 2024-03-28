@@ -67,7 +67,7 @@ end
 spindle_exists
 
 figure
-plot((1:length(eeg_signal))/Fs, eeg_signal);
+plot((1:length(eeg_preprocess))/Fs, eeg_preprocess);
 hold on; % Hold on to the current plot
 
 % Loop through detected spindles and overlay them
@@ -77,7 +77,7 @@ for i = 1:size(spindles, 1)
     end_idx = spindles(i, 2);
     
     % Overlay spindle on the plot
-    plot((start_idx:end_idx)/Fs, eeg_signal(start_idx:end_idx), 'r', 'LineWidth', 2);
+    plot((start_idx:end_idx)/Fs, eeg_preprocess(start_idx:end_idx), 'r', 'LineWidth', 2);
 end
 
 hold off; % Release the plot hold
