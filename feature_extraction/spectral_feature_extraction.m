@@ -19,7 +19,8 @@ function spec_features = spectral_feature_extraction(signal, Fs)
     end
     
     SR = f(i-1);
-
+    
+    %spec_features = [centroid, SFM, SR];
     spec_features = struct('Centroid', centroid, 'SFM', SFM, 'SR', SR);
 
 end
