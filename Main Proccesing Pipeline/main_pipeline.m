@@ -128,26 +128,34 @@ save("Main Proccesing Pipeline/Feature_Extracted_Data.mat", "Patient_Data")
 %% Load the feature extracted data (This may take some time)
 load("Feature_Extracted_Data.mat")
 %% Analyze features to perform feature selection (choose appropriate feature for appropriate signal and analyze)
-numberOfEpochs = Patient_Data.R1.numberOfEpochs;
+
 feature = [];
-patient_Name = "R1";
-signal_Name = "ECG_features";
-feature_name = "SR";
+patient_Name = "R1"; %Choose patient name R1, R2 ...
+signal_Name = "EEG_sec"; %Choose signal EEG, EEG_sec, EMG ...
+feature_name = "Mean_Absolute_Value"; %Choose feature Mean_Absolute_Value, Skewness ...
+feature_type = "temporal"; %Choose feature type temporal or spectral
+
+%Run to aquire anova test with box plots
+numberOfEpochs = Patient_Data.(patient_Name).numberOfEpochs;
+
+signal_string = sprintf("%s_features", signal_Name);
 
 for epochNumber=1:numberOfEpochs-1
-    feature_string = sprintf("ECG_spectral_features_Epoch_%d", epochNumber);
+    feature_string = sprintf("%s_%s_features_Epoch_%d", signal_Name, feature_type, epochNumber);
     
 
-    feature = [feature, Patient_Data.(patient_Name).(signal_Name).(feature_string).(feature_name)];
+    feature = [feature, Patient_Data.(patient_Name).(signal_string).(feature_string).(feature_name)];
     
     
 end
 
-sleep_stage = Patient_Data.R1.sleep_stages;
+sleep_stage = Patient_Data.(patient_Name).sleep_stages;
 sleep_stage = sleep_stage(1:30:length(sleep_stage)-1);
 sleepStagesCategorical = categorical(sleep_stage, [0,2,3,4,5], {'REM','N3','N2','N1','Wake'});
 
-boxplot(feature, sleepStagesCategorical);
-ylabel("Feature Value")
-xlabel("Sleep Stage")
-title("Distribution of Feature")
+%boxplot(feature, sleepStagesCategorical);
+%ylabel("Feature Value")
+%xlabel("Sleep Stage")
+%title("Distribution of Feature")
+
+[p, tbl, stats] = anova1(feature, sleepStagesCategorical);

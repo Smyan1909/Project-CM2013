@@ -124,3 +124,6 @@ rmssd = sqrt(mean(squared_diff));
 
 % Display RMSSD
 disp(['RMSSD: ', num2str(rmssd), ' seconds']);
+%% Testing spec features
+spec_features = spectral_feature_extraction(ecg_denoised, Fs)
+temp_feats = temporal_feature_extraction(ecg_denoised, Fs)
