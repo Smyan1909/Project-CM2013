@@ -1,4 +1,4 @@
-function Hd = bandpass_15_8_parzen
+function Hd = parzenFIR_EOG_blink
 %BANDPASS_15_8_PARZEN Returns a discrete-time filter object.
 
 % MATLAB Code
@@ -18,7 +18,7 @@ flag = 'scale';  % Sampling Flag
 win = parzenwin(N+1);
 
 % Calculate the coefficients using the FIR1 function.
-b  = fir1(N, [Fc1 Fc2]/(Fs/2), 'bandpass', win, flag);
+b  = fir1(N, [Fc1, Fc2]/(Fs/2), 'bandpass', win, flag);
 Hd = dfilt.dffir(b);
 
 % [EOF]
