@@ -31,5 +31,5 @@ codegen/
 octave-workspace
 
 # Path definition file, generated with MATLAB's pathsave
-pathdef.m
+pathdef*.m
 startup.m
