@@ -73,9 +73,11 @@ for i=1:numPatients
         eeg_preprocess = preprocess_EEG(EEG_signal(eeg_epoch_start:eeg_epoch_end), EEG_Fs);
         EEG_temp_features = sprintf("EEG_temporal_features_Epoch_%d", epochNumber);
         EEG_spec_features = sprintf("EEG_spectral_features_Epoch_%d", epochNumber);
+        EEG_wave_features = sprintf("EEG_wave_features_Epoch_%d", epochNumber);
 
         Patient_Data.(patient_Number).EEG_features.(EEG_temp_features) = temporal_feature_extraction(eeg_preprocess, EEG_Fs);
         Patient_Data.(patient_Number).EEG_features.(EEG_spec_features) = spectral_feature_extraction(eeg_preprocess, EEG_Fs);
+        Patient_Data.(patient_Number).EEG_features.(EEG_wave_features) = waves_feature_extraction(eeg_preprocess, EEG_Fs);
 
         EEG_preprocessed = [EEG_preprocessed, eeg_preprocess];
 
@@ -124,16 +126,18 @@ for i=1:numPatients
     
 end
 save("Main Proccesing Pipeline/Feature_Extracted_Data.mat", "Patient_Data")
+%% Add visual features to pipeline. 
+
 
 %% Load the feature extracted data (This may take some time)
 load("Feature_Extracted_Data.mat")
 %% Analyze features to perform feature selection (choose appropriate feature for appropriate signal and analyze)
 
 feature = [];
-patient_Name = "R1"; %Choose patient name R1, R2 ...
-signal_Name = "EEG_sec"; %Choose signal EEG, EEG_sec, EMG ...
-feature_name = "Mean_Absolute_Value"; %Choose feature Mean_Absolute_Value, Skewness ...
-feature_type = "temporal"; %Choose feature type temporal or spectral
+patient_Name = "R10"; %Choose patient name R1, R2 ...
+signal_Name = "EEG"; %Choose signal EEG, EEG_sec, EMG ...
+feature_name = "beta_features"; %Choose feature Mean_Absolute_Value, Skewness ...
+feature_type = "wave"; %Choose feature type temporal or spectral
 
 %Run to aquire anova test with box plots
 numberOfEpochs = Patient_Data.(patient_Name).numberOfEpochs;
@@ -142,10 +146,10 @@ signal_string = sprintf("%s_features", signal_Name);
 
 for epochNumber=1:numberOfEpochs-1
     feature_string = sprintf("%s_%s_features_Epoch_%d", signal_Name, feature_type, epochNumber);
-    
+    %feature_string = sprintf("ECG_%s_features_Epoch_%d", feature_type, epochNumber);
 
     feature = [feature, Patient_Data.(patient_Name).(signal_string).(feature_string).(feature_name)];
-    
+    %feature = [feature, Patient_Data.(patient_Name).(signal_string).(feature_string).(feature_name).wave_power_percentage];
     
 end
 
@@ -159,3 +163,5 @@ sleepStagesCategorical = categorical(sleep_stage, [0,2,3,4,5], {'REM','N3','N2',
 %title("Distribution of Feature")
 
 [p, tbl, stats] = anova1(feature, sleepStagesCategorical);
+
+%% Create feature matrix and choose ML model
