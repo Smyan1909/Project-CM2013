@@ -107,3 +107,10 @@ be
 ### Continuous wavelet transform
 Tao (2023) remarks that the relevant elements of EOG are non-periodic,
 hence wavelet analysis is preferable to Fourier transform-based methods.
+
+### Eye blinks
+Eye blinks are a visual (time domain) feature, and in terms of feature input/presentation
+to the ML algorithm it probably makes most sense to treat them either as binary feature
+(blinks present/not present) or a numerical feature (e.g. blink count per epoch).
+The second option is obviously more demanding and might not be worth the additional effort
+to implement.
