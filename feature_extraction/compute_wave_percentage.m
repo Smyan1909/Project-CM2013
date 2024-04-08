@@ -25,7 +25,7 @@ function wave_stats = compute_wave_percentage(signal, Fs, freq_range)
                         'wave_proportion', []);
     
     % Filter the signal to isolate the frequency range of interest
-    EEG_bandpass_filter = filter_eeg_alpha_waves; % Assumes existence of a predefined filter function
+    EEG_bandpass_filter = filter_eeg_alpha_waves; 
     filtered_signal = filter(EEG_bandpass_filter, signal);
     
     % Set up the sliding window analysis parameters
@@ -43,8 +43,6 @@ function wave_stats = compute_wave_percentage(signal, Fs, freq_range)
     
     % Count of windows where the specified wave is dominant
     wave_count = 0;
-    
-    % Compute the total number of analysis windows
     total_segments = floor((length(signal) - window_size) / overlap) + 1;
 
     % Analyze the signal using a sliding window approach
@@ -60,9 +58,9 @@ function wave_stats = compute_wave_percentage(signal, Fs, freq_range)
     
         % Apply amplitude threshold to consider significant signal segments
         if max(abs(windowed_signal)) > amplitude_threshold 
-            total_power = total_power + sum(pxx); % Update total power
+            total_power = total_power + sum(pxx); 
             [~, max_power_idx] = max(pxx); % Find the frequency with maximum power
-            max_power_freq = f(max_power_idx); % Extract frequency value
+            max_power_freq = f(max_power_idx); 
             
             % Check if the max power frequency falls within the specified range
             if max_power_freq >= freq_range(1) && max_power_freq <= freq_range(2)
