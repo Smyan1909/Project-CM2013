@@ -34,3 +34,4 @@ octave-workspace
 pathdef*.m
 startup.m
 _preproc_out
+*.mat
