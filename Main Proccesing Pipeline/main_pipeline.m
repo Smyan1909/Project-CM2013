@@ -124,16 +124,18 @@ for i=1:numPatients
     
 end
 save("Main Proccesing Pipeline/Feature_Extracted_Data.mat", "Patient_Data")
+%% Add visual features to pipeline. 
+
 
 %% Load the feature extracted data (This may take some time)
 load("Feature_Extracted_Data.mat")
 %% Analyze features to perform feature selection (choose appropriate feature for appropriate signal and analyze)
 
 feature = [];
-patient_Name = "R1"; %Choose patient name R1, R2 ...
+patient_Name = "R10"; %Choose patient name R1, R2 ...
 signal_Name = "EEG_sec"; %Choose signal EEG, EEG_sec, EMG ...
-feature_name = "Mean_Absolute_Value"; %Choose feature Mean_Absolute_Value, Skewness ...
-feature_type = "temporal"; %Choose feature type temporal or spectral
+feature_name = "Centroid"; %Choose feature Mean_Absolute_Value, Skewness ...
+feature_type = "spectral"; %Choose feature type temporal or spectral
 
 %Run to aquire anova test with box plots
 numberOfEpochs = Patient_Data.(patient_Name).numberOfEpochs;
@@ -159,3 +161,5 @@ sleepStagesCategorical = categorical(sleep_stage, [0,2,3,4,5], {'REM','N3','N2',
 %title("Distribution of Feature")
 
 [p, tbl, stats] = anova1(feature, sleepStagesCategorical);
+
+%% Create feature matrix and choose ML model
