@@ -99,9 +99,11 @@ for i=1:numPatients
         eeg_sec_preprocess = preprocess_EEG(EEG_sec_signal(eeg_sec_epoch_start:eeg_sec_epoch_end), EEG_sec_Fs);
         EEG_sec_temp_features = sprintf("EEG_sec_temporal_features_Epoch_%d", epochNumber);
         EEG_sec_spec_features = sprintf("EEG_sec_spectral_features_Epoch_%d", epochNumber);
+        EEG_sec_wave_features = sprintf("EEG_sec_wave_features_Epoch_%d", epochNumber);
 
         Patient_Data.(patient_Number).EEG_sec_features.(EEG_sec_temp_features) = temporal_feature_extraction(eeg_sec_preprocess, EEG_sec_Fs);
         Patient_Data.(patient_Number).EEG_sec_features.(EEG_sec_spec_features) = spectral_feature_extraction(eeg_sec_preprocess, EEG_sec_Fs);
+        Patient_Data.(patient_Number).EEG_sec_features.(EEG_sec_wave_features) = waves_feature_extraction(eeg_sec_preprocess, EEG_sec_Fs);
 
         EEG_sec_preprocessed = [EEG_sec_preprocessed, eeg_sec_preprocess];
 
