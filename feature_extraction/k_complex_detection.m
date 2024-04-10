@@ -4,7 +4,7 @@ function k_complex_exist = k_complex_detection(signal, Fs)
     
     %Filter the EEG signal as such to only capture the delta waves
     delta_filter = EEG_butterworth_filter;
-    filtered_signal = filter(delta_filter, signal);
+    eeg_filtered = filter(delta_filter, signal);
 
     %Make a moving average filter to remove sudden changes in the signal
     windowSize = 40; %samples not seconds!!!

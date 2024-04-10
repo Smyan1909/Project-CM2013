@@ -152,7 +152,6 @@ for i=1:numPatients
     
 end
 save("Main Proccesing Pipeline/Feature_Extracted_Data.mat", "Patient_Data")
-%% Add visual features to pipeline. 
 
 
 %% Load the feature extracted data (This may take some time)
