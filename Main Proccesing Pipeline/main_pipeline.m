@@ -74,10 +74,12 @@ for i=1:numPatients
         EEG_temp_features = sprintf("EEG_temporal_features_Epoch_%d", epochNumber);
         EEG_spec_features = sprintf("EEG_spectral_features_Epoch_%d", epochNumber);
         EEG_wave_features = sprintf("EEG_wave_features_Epoch_%d", epochNumber);
+        EEG_binary_features = sprintf("EEG_binary_features_Epoch_%d", epochNumber);
 
         Patient_Data.(patient_Number).EEG_features.(EEG_temp_features) = temporal_feature_extraction(eeg_preprocess, EEG_Fs);
         Patient_Data.(patient_Number).EEG_features.(EEG_spec_features) = spectral_feature_extraction(eeg_preprocess, EEG_Fs);
         Patient_Data.(patient_Number).EEG_features.(EEG_wave_features) = waves_feature_extraction(eeg_preprocess, EEG_Fs);
+        Patient_Data.(patient_Number).EEG_features.(EEG_binary_features) = binary_feature_extraction(eeg_preprocess, EEG_Fs);
 
         EEG_preprocessed = [EEG_preprocessed, eeg_preprocess];
 
@@ -87,9 +89,11 @@ for i=1:numPatients
         ecg_preprocess = preprocess_ECG(ECG_signal(ecg_epoch_start:ecg_epoch_end), ECG_Fs);
         ECG_temp_features = sprintf("ECG_temporal_features_Epoch_%d", epochNumber);
         ECG_spec_features = sprintf("ECG_spectral_features_Epoch_%d", epochNumber);
+        ECG_hrv = sprintf("ECG_hrv_Epoch_%d", epochNumber);
 
         Patient_Data.(patient_Number).ECG_features.(ECG_temp_features) = temporal_feature_extraction(ecg_preprocess, ECG_Fs);
         Patient_Data.(patient_Number).ECG_features.(ECG_spec_features) = spectral_feature_extraction(ecg_preprocess, ECG_Fs);
+        Patient_Data.(patient_Number).ECG_features.(ECG_hrv) = hrv_calculation(ecg_preprocess, ECG_Fs);
 
         ECG_preprocessed = [ECG_preprocessed, ecg_preprocess];
 
@@ -100,10 +104,12 @@ for i=1:numPatients
         EEG_sec_temp_features = sprintf("EEG_sec_temporal_features_Epoch_%d", epochNumber);
         EEG_sec_spec_features = sprintf("EEG_sec_spectral_features_Epoch_%d", epochNumber);
         EEG_sec_wave_features = sprintf("EEG_sec_wave_features_Epoch_%d", epochNumber);
+        EEG_sec_binary_features = sprintf("EEG_sec_binary_features_Epoch_%d", epochNumber);
 
         Patient_Data.(patient_Number).EEG_sec_features.(EEG_sec_temp_features) = temporal_feature_extraction(eeg_sec_preprocess, EEG_sec_Fs);
         Patient_Data.(patient_Number).EEG_sec_features.(EEG_sec_spec_features) = spectral_feature_extraction(eeg_sec_preprocess, EEG_sec_Fs);
         Patient_Data.(patient_Number).EEG_sec_features.(EEG_sec_wave_features) = waves_feature_extraction(eeg_sec_preprocess, EEG_sec_Fs);
+        Patient_Data.(patient_Number).EEG_sec_features.(EEG_sec_binary_features) = binary_feature_extraction(eeg_sec_preprocess, EEG_sec_Fs);
 
         EEG_sec_preprocessed = [EEG_sec_preprocessed, eeg_sec_preprocess];
 
@@ -119,6 +125,24 @@ for i=1:numPatients
 
         EMG_preprocessed = [EMG_preprocessed, emg_preprocess];
 
+        eogr_epoch_start = (epochNumber*EOGR_Fs*30);
+        eogr_epoch_end = min(eogr_epoch_start + 30*EOGR_Fs, length(EOGR_signal));
+        
+        EOGR_temp_features = sprintf("EOGR_temporal_features_Epoch_%d", epochNumber);
+        EOGR_spec_features = sprintf("EOGR_spectral_features_Epoch_%d", epochNumber);
+
+        Patient_Data.(patient_Number).EOGR_features.(EOGR_temp_features) = temporal_feature_extraction(EOGR_signal(eogr_epoch_start:eogr_epoch_end), EOGR_Fs);
+        Patient_Data.(patient_Number).EOGR_features.(EOGR_spec_features) = spectral_feature_extraction(EOGR_signal(eogr_epoch_start:eogr_epoch_end), EOGR_Fs);
+        
+
+        eogl_epoch_start = (epochNumber*EOGL_Fs*30);
+        eogl_epoch_end = min(eogl_epoch_start + 30*EOGL_Fs, length(EOGL_signal));
+        
+        EOGL_temp_features = sprintf("EOGL_temporal_features_Epoch_%d", epochNumber);
+        EOGL_spec_features = sprintf("EOGL_spectral_features_Epoch_%d", epochNumber);
+
+        Patient_Data.(patient_Number).EOGL_features.(EOGL_temp_features) = temporal_feature_extraction(EOGL_signal(eogl_epoch_start:eogl_epoch_end), EOGL_Fs);
+        Patient_Data.(patient_Number).EOGL_features.(EOGL_spec_features) = spectral_feature_extraction(EOGL_signal(eogl_epoch_start:eogl_epoch_end), EOGL_Fs);
             
     end
     Patient_Data.(patient_Number).EEG_preprocessed = EEG_preprocessed;
