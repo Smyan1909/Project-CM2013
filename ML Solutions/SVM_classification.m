@@ -65,8 +65,8 @@ y_pred = predict(SVMModel, x_test);
 accuracy = sum(y_pred == y_test) / numel(y_test);
 fprintf('Accuracy: %.2f%%\n', accuracy * 100);
 
-y_pred = categorical(y_pred, [0,2,3,4,5], {'REM','N3','N2','N1','Wake'});
-y_test = categorical(y_test, [0,2,3,4,5], {'REM','N3','N2','N1','Wake'});
+y_pred_cat = categorical(y_pred, [0,2,3,4,5], {'REM','N3','N2','N1','Wake'});
+y_test_cat = categorical(y_test, [0,2,3,4,5], {'REM','N3','N2','N1','Wake'});
 
-confusionchart(y_test, y_pred, 'RowSummary','row-normalized', ...
+confusionchart(y_test_cat, y_pred_cat, 'RowSummary','row-normalized', ...
             'ColumnSummary','column-normalized')
