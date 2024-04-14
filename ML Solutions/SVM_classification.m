@@ -1,67 +1,95 @@
 %% Generate Feature Matrix
 [feat_mat, sleep_stage_vec] = create_feature_matrix();
 
-%% Save feat_mat and sleep_stage_vec (Optional)
-save("ML Solutions/Feature_Matrix.mat")
-
 
 %% Normalize features
 
-% Detect types
-% Example feature matrix dimensions
-[numSamples, numFeatures] = size(feat_mat);
+normalizedfeat_mat = create_normalized_matrix(feat_mat);
+%% Feature Selection Using ANOVA
 
-% Detect and handle NaN values robustly
-for i = 1:numFeatures
-    if any(isnan(feat_mat(:, i)))
-        feat_mat(isnan(feat_mat(:, i)), i) = median(feat_mat(~isnan(feat_mat(:, i)), i), 'omitnan');
-    end
-end
-
-% Preallocate logical index arrays for feature types
-isBinary = false(1, numFeatures);
-isContinuous = true(1, numFeatures);  % Assume all features are continuous by default
-percentageColumns = [16, 18, 20, 22, 57, 59, 61, 63]; % Columns that are percentage values
-
-% Update continuous feature identifier to exclude percentage columns
-isContinuous(percentageColumns) = false; % These are not treated as standard continuous features
-
-% Detect types for binary and adjust continuous accordingly
-for i = 1:numFeatures
-    uniqueVals = unique(feat_mat(:, i));
-    if length(uniqueVals) == 2 && all(uniqueVals == [0; 1])
-        isBinary(i) = true;
-        isContinuous(i) = false;  % Not continuous if it's binary
-    end
-end
-
-% Initialize the normalized matrix
-normalizedfeat_mat = zeros(size(feat_mat));
-
-% Normalize percentage columns by dividing by 100
-normalizedfeat_mat(:, percentageColumns) = feat_mat(:, percentageColumns) / 100;
-
-% Z-score standardization for other continuous features
-for i = find(isContinuous)
-    meanVal = mean(feat_mat(:, i));
-    stdDev = std(feat_mat(:, i));
-    normalizedfeat_mat(:, i) = (feat_mat(:, i) - meanVal) / stdDev;
-end
-
-% Copy binary features directly
-normalizedfeat_mat(:, isBinary) = feat_mat(:, isBinary);
-
+normalizedfeat_mat = feature_selection(normalizedfeat_mat, sleep_stage_vec, 60);
 %% Split the data into training data and test data by dividing for after patient 8
 x_train = normalizedfeat_mat(1:(numSamples - (1085+1083)),:);
 y_train = sleep_stage_vec(1:(numSamples - (1085+1083)));
 
 x_test = normalizedfeat_mat(((numSamples - (1085+1083))+1):numSamples, :);
 y_test = sleep_stage_vec(((numSamples - (1085+1083))+1):numSamples);
-%% Train the model
+%% Alternative way to split the data into training and test data by randomly holding out 20% of the data
+% Number of observations
+numObservations = size(normalizedfeat_mat, 1);
+
+% Create a random partition of data into training and test sets (80%-20%)
+c = cvpartition(numObservations, 'HoldOut', 0.20);
+
+% Indices for training and test sets
+trainIdx = training(c);
+testIdx = test(c);
+
+% Create training data
+x_train = normalizedfeat_mat(trainIdx, :);
+y_train = sleep_stage_vec(trainIdx);
+
+% Create test data
+x_test = normalizedfeat_mat(testIdx, :);
+y_test = sleep_stage_vec(testIdx);
+
+%% Cross validation for hyperparameter selection for SVM model
+% Set up the parameter grid
+kernels = {'linear', 'rbf', 'polynomial'};
+boxConstraints = [0.1, 1, 10];  % Extended range for BoxConstraint
+
+k = 10; % Number of folds for cross-validation
+cvp = cvpartition(y_train, 'KFold', k);
+
+%% Cross-Validation Execution with BoxConstraint Search
+results = struct();
+index = 0;
+
+for i = 1:length(kernels)
+    kernel = kernels{i};
+    for boxConstraint = boxConstraints
+        index = index + 1;
+        fprintf('Testing configuration %d: Kernel = %s, BoxConstraint = %.2f\n', index, kernel, boxConstraint);
+
+        template = templateSVM('KernelFunction', kernel, 'KernelScale', 'auto', ...
+                               'BoxConstraint', boxConstraint, 'Standardize', true);
+        svmModel = fitcecoc(x_train, y_train, 'Learners', template, 'Coding', 'onevsone', ...
+                            'CVPartition', cvp, 'Verbose', 1);
+
+        % Assess the model
+        loss = kfoldLoss(svmModel, 'LossFun', 'ClassifError');
+        validationPredictions = kfoldPredict(svmModel);
+        % Calculate validation accuracy
+        validationAccuracy = sum(validationPredictions == y_train) / numel(y_train) * 100;
+        
+        results(index).Kernel = kernel;
+        results(index).BoxConstraint = boxConstraint;
+        results(index).Loss = loss;
+        results(index).Model = svmModel;
+        results(index).ValidationAccuracy = validationAccuracy;
+
+        fprintf('Configuration %d: Loss = %.2f%%, Accuracy = %.2f%%\n', index, loss * 100, validationAccuracy);
+    end
+end
+
+%% Identify the Best Configuration Based on Minimum Loss
+losses = arrayfun(@(s) s.Loss, results);
+[minLoss, minIdx] = min(losses);
+bestParams = results(minIdx);
+
+fprintf('Best configuration: Kernel = %s, BoxConstraint = %.2f, Loss = %.2f%%, Accuracy = %.2f%%\n', ...
+        bestParams.Kernel, bestParams.BoxConstraint, minLoss * 100, bestParams.ValidationAccuracy);
+
+%% Train the Final Model on Full Training Data Using the Best Parameters
+finalTemplate = templateSVM('KernelFunction', bestParams.Kernel, 'KernelScale', 'auto', ...
+                            'BoxConstraint', bestParams.BoxConstraint, 'Standardize', true);
+finalSVMModel = fitcecoc(x_train, y_train, 'Learners', finalTemplate, 'Coding', 'onevsone', 'Verbose', 2);
+
+%% Train the model (without cross validation for comparison)
 template = templateSVM('KernelFunction', 'rbf', 'KernelScale', 'auto', 'BoxConstraint', 1, 'Standardize', true);
-SVMModel = fitcecoc(x_train, y_train, 'Learners', template, 'Coding', 'onevsall', 'Verbose',2);
+SVMModel = fitcecoc(x_train, y_train, 'Learners', template, 'Coding', 'onevsone', 'Verbose',2);
 %% Test the model
-y_pred = predict(SVMModel, x_test);
+y_pred = predict(finalSVMModel, x_test);
 accuracy = sum(y_pred == y_test) / numel(y_test);
 fprintf('Accuracy: %.2f%%\n', accuracy * 100);
 
