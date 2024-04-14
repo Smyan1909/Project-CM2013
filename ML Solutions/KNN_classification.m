@@ -3,7 +3,7 @@
 
 %% Normalize features
 
-normalizedfeat_mat = create_normalized_matrix(feat_mat);
+[normalizedfeat_mat, numSamples] = create_normalized_matrix(feat_mat);
 
 %% Feature selection using anova
 

@@ -4,7 +4,7 @@
 
 %% Normalize features
 
-normalizedfeat_mat = create_normalized_matrix(feat_mat);
+[normalizedfeat_mat, numSamples] = create_normalized_matrix(feat_mat);
 %% Feature Selection Using ANOVA
 
 normalizedfeat_mat = feature_selection(normalizedfeat_mat, sleep_stage_vec, 60);

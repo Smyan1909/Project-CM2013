@@ -1,4 +1,4 @@
-function normalizedfeat_mat = create_normalized_matrix(feat_mat)
+function [normalizedfeat_mat, numSamples] = create_normalized_matrix(feat_mat)
     % This function creates a normalized feature matrix
     [numSamples, numFeatures] = size(feat_mat);
 
