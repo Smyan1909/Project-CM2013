@@ -7,13 +7,13 @@
 [normalizedfeat_mat, numSamples] = create_normalized_matrix(feat_mat);
 %% Feature Selection Using ANOVA
 
-normalizedfeat_mat = feature_selection(normalizedfeat_mat, sleep_stage_vec, 60);
+normalizedfeat_mat = feature_selection(normalizedfeat_mat, sleep_stage_vec);
 %% Split the data into training data and test data by dividing for after patient 8
-x_train = normalizedfeat_mat(1:(numSamples - (1085+1083)),:);
-y_train = sleep_stage_vec(1:(numSamples - (1085+1083)));
+x_train = normalizedfeat_mat(1:(numSamples - (1083)),:); % 1085
+y_train = sleep_stage_vec(1:(numSamples - (1083)));
 
-x_test = normalizedfeat_mat(((numSamples - (1085+1083))+1):numSamples, :);
-y_test = sleep_stage_vec(((numSamples - (1085+1083))+1):numSamples);
+x_test = normalizedfeat_mat(((numSamples - (1083))+1):numSamples, :);
+y_test = sleep_stage_vec(((numSamples - (1083))+1):numSamples);
 %% Alternative way to split the data into training and test data by randomly holding out 20% of the data
 % Number of observations
 numObservations = size(normalizedfeat_mat, 1);
@@ -90,11 +90,23 @@ template = templateSVM('KernelFunction', 'rbf', 'KernelScale', 'auto', 'BoxConst
 SVMModel = fitcecoc(x_train, y_train, 'Learners', template, 'Coding', 'onevsone', 'Verbose',2);
 %% Test the model
 y_pred = predict(finalSVMModel, x_test);
+y_pred = medfilt1(y_pred, 5);
+
 accuracy = sum(y_pred == y_test) / numel(y_test);
 fprintf('Accuracy: %.2f%%\n', accuracy * 100);
 
 y_pred_cat = categorical(y_pred, [0,2,3,4,5], {'REM','N3','N2','N1','Wake'});
 y_test_cat = categorical(y_test, [0,2,3,4,5], {'REM','N3','N2','N1','Wake'});
 
+figure
 confusionchart(y_test_cat, y_pred_cat, 'RowSummary','row-normalized', ...
-            'ColumnSummary','column-normalized')
+           'ColumnSummary','column-normalized')
+
+figure
+plot(((1:length(y_test))).*30,y_test_cat)
+hold on
+plot(((1:length(y_pred))).*30,y_pred_cat)
+legend({"Annotated Data", "Predicted Data"})
+xlabel("Time [s]")
+ylabel("Sleep Stage")
+
