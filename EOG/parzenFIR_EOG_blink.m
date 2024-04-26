@@ -1,4 +1,4 @@
-function Hd = parzenFIR_EOG_blink
+function Hd = parzenFIR_EOG_blink(Fs)
 %BANDPASS_15_8_PARZEN Returns a discrete-time filter object.
 
 % MATLAB Code
@@ -8,7 +8,9 @@ function Hd = parzenFIR_EOG_blink
 % FIR Window Bandpass filter designed using the FIR1 function.
 
 % All frequency values are in Hz.
-Fs = 50;  % Sampling Frequency
+arguments
+    Fs = 50;  % Sampling Frequency
+end
 
 N    = 100;      % Order
 Fc1  = 1.5;      % First Cutoff Frequency

@@ -17,4 +17,6 @@ diffed = diff(signals, 1, 2);
 
 smoothdiffed = movmean(diffed, smooth_secs * fs, 2);
 
+
+
 end

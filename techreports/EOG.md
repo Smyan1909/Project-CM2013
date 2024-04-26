@@ -114,3 +114,12 @@ to the ML algorithm it probably makes most sense to treat them either as binary 
 (blinks present/not present) or a numerical feature (e.g. blink count per epoch).
 The second option is obviously more demanding and might not be worth the additional effort
 to implement.
+
+Based on the algorithm proposed by Pander, Przybyła and Czabański (2008), it was
+determined that the best performance is indeed provided by an analogous
+implementation, which consists of:
+ * median filter of 5 samples
+ * Parzen FIR filter of 100 taps, passband 1.5–8 Hz
+ * squared signal
+ * moving average of 18 samples (= 360 ms) length|
+ * peak detection - propose 
