@@ -133,18 +133,22 @@ for i=1:numPatients
         
         EOGR_temp_features_strID = sprintf("EOGR_temporal_features_Epoch_%d", epochNumber);
         EOGR_spec_features_strID = sprintf("EOGR_spectral_features_Epoch_%d", epochNumber);
+        EOGR_vis_features_strID  = sprintf("EOGR_visual_features_Epoch_%d", epochNumber);
 
         Patient_Data.(patient_Number).EOGR_features.(EOGR_temp_features_strID) = temporal_feature_extraction(EOGR_signal(eogr_epoch_start:eogr_epoch_end), EOGR_Fs);
         Patient_Data.(patient_Number).EOGR_features.(EOGR_spec_features_strID) = spectral_feature_extraction(EOGR_signal(eogr_epoch_start:eogr_epoch_end), EOGR_Fs);
+        Patient_Data.(patient_Number).EOGR_features.(EOGR_vis_features_strID) = visual_EOG_feature_extraction(EOGR_signal(eogr_epoch_start:eogr_epoch_end), EOGR_Fs);
 
         eogl_epoch_start = (epochNumber*EOGL_Fs*30);
         eogl_epoch_end = min(eogl_epoch_start + 30*EOGL_Fs, length(EOGL_signal));
         
         EOGL_temp_features_strID = sprintf("EOGL_temporal_features_Epoch_%d", epochNumber);
         EOGL_spec_features_strID = sprintf("EOGL_spectral_features_Epoch_%d", epochNumber);
+        EOGL_vis_features_strID  = sprintf("EOGL_visual_features_Epoch_%d", epochNumber);
 
         Patient_Data.(patient_Number).EOGL_features.(EOGL_temp_features_strID) = temporal_feature_extraction(EOGL_signal(eogl_epoch_start:eogl_epoch_end), EOGL_Fs);
         Patient_Data.(patient_Number).EOGL_features.(EOGL_spec_features_strID) = spectral_feature_extraction(EOGL_signal(eogl_epoch_start:eogl_epoch_end), EOGL_Fs);
+        Patient_Data.(patient_Number).EOGL_features.(EOGL_vis_features_strID) = visual_EOG_feature_extraction(EOGL_signal(eogl_epoch_start:eogl_epoch_end), EOGL_Fs);
             
     end
     Patient_Data.(patient_Number).EEG_preprocessed = EEG_preprocessed;
