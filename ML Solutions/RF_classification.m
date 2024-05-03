@@ -97,3 +97,6 @@ y_test_cat = categorical(y_test, [0,2,3,4,5], {'REM','N3','N2','N1','Wake'});
 
 confusionchart(y_test_cat, y_pred_cat, 'RowSummary','row-normalized', ...
             'ColumnSummary','column-normalized');
+
+%% Save test results for later analysis.
+save(strcat("RF_classification_test_", string(datetime(), 'yyyy-MM-dd''T''HHmm'),".mat"), 'y_pred', 'x_test');
