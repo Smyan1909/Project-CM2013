@@ -1,5 +1,5 @@
 function [x_train, y_train, x_val, y_val, x_test, y_test] = split_data(feat_mat, sleep_stage_vec, train_patients, val_patients, test_patients)
-    % Hardcoded patient samples
+    % Hardcoded patient samples (not ideal I think)
     patientSamples = [1083, 1078, 1048, 874, 1083, 1083, 918, 958, 1085, 1083];
     cumulativeSamples = [0, cumsum(patientSamples)];    
 

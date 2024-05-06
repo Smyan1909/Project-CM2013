@@ -1,5 +1,7 @@
+%% For this method, I use k-fold validation to select the parameters.
+
 % Load Data
-[feat_mat, sleep_stage_vec] = create_feature_matrix();
+%[feat_mat, sleep_stage_vec] = create_feature_matrix();
 
 % Split Data
 patientsSamples = [1083, 1078, 1048, 874, 1083, 1083, 918, 958, 1085, 1083]; % Number of samples per patient
@@ -14,11 +16,11 @@ test_patients = [9,10];
 
 %% Random Forest Model Setup
 % Hyperparameters to test (Primary list, yet to explore other ones)
-numTrees = [300];  % Number of trees in the forest
-maxNumSplits = [10, 50]; % Maximum number of splits in each decision tree
+numTrees = [100, 200, 500];  % Number of trees in the forest
+maxNumSplits = [10, 20, 50]; % Maximum number of splits in each decision tree
 
 % Set up cross-validation partition
-k = 10; % Number of folds for cross-validation
+k = 5; % Number of folds for cross-validation
 cvp = cvpartition(y_train, 'KFold', k);
 
 
@@ -95,3 +97,6 @@ y_test_cat = categorical(y_test, [0,2,3,4,5], {'REM','N3','N2','N1','Wake'});
 
 confusionchart(y_test_cat, y_pred_cat, 'RowSummary','row-normalized', ...
             'ColumnSummary','column-normalized');
+
+%% Save test results for later analysis.
+save(strcat("RF_classification_cross_val_test_", string(datetime(), 'yyyy-MM-dd''T''HHmm'),".mat"), 'y_pred', 'x_test');

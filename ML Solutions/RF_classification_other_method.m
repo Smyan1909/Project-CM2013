@@ -1,3 +1,7 @@
+%% For this method, I use simple cross-validation (no k-fold) with two possible ways to select the best operating model
+%% Either, we select the model that minimizes the OOB error on the training data, or the model that maximizes accuracy on 
+%% the validation data. 
+
 % Load Data
 [feat_mat, sleep_stage_vec] = create_feature_matrix();
 
@@ -10,7 +14,7 @@ test_patients = [9,10];
 [x_train, y_train, x_val, y_val, x_test, y_test] = split_data(feat_mat, sleep_stage_vec, train_patients, val_patients, test_patients);
 
 % Preprocess Data
-[x_train, x_val, x_test] = preprocess_data(x_train, x_val, x_test, false);
+[x_train, x_val, x_test] = preprocess_data(x_train, x_val, x_test, false); % false means there is no normalization
 
 % Constants and Initial Setup
 numFeatures = size(feat_mat, 2);
@@ -40,7 +44,7 @@ y_test_cat = categorical(y_test, [0,2,3,4,5], {'REM','N3','N2','N1','Wake'});
 confusionchart(y_test_cat, y_pred_cat, 'RowSummary','row-normalized', ...
             'ColumnSummary','column-normalized');
 
-% Assuming bestModel is your trained TreeBagger model
+
 evaluate_model_rf(bestModel, x_train, y_train, 'Training Data');
 evaluate_model_rf(bestModel, x_val, y_val, 'Validation Data');
 evaluate_model_rf(bestModel, x_test, y_test, 'Test Data');
