@@ -12,6 +12,6 @@ filted = filter(filtHd, unspiked);
 sqrd = filted .^ 2;
 avged = movmean(sqrd, 17);
 
-procChan = avged;
+procChan = avged / max(avged); % normalization to [0 ; 1]
 
 end

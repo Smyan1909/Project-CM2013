@@ -51,6 +51,7 @@ fprintf('Best K by cross-validation: %d with accuracy: %.2f%%\n', bestK, bestAcc
 % Re-train with the best k
 knnModel = fitcknn(x_train, y_train, 'NumNeighbors', bestK);
 y_pred = predict(knnModel, x_test);
+y_pred = medfilt1(y_pred, 5);
 accuracy = sum(y_pred == y_test) / numel(y_test);
 fprintf('Optimized KNN Accuracy: %.2f%%\n', accuracy * 100);
 %% Plot the Confusion Matrix

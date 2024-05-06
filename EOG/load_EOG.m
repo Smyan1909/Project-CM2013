@@ -7,6 +7,7 @@ arguments
     fileNo int32
     whichSide char = ''
 end
+
 EDF_FILENAME_FMTSTR = 'Project Data (modified dates)/R%d.edf';
 XML_FILENAME_FMTSTR = 'Project Data/R%d.xml';
 
