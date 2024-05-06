@@ -10,4 +10,5 @@ function sus = classify_suspect_stages(stages)
   medfilted = medfilt1(stages);
   medfilted_isModified = logical(stages - medfilted);
   
+  sus = medfilted_isModified;
 end
