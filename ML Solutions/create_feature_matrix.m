@@ -10,7 +10,7 @@ function [feat_mat, sleep_stage_vec] = create_feature_matrix()
     feat_mat = [];
     sleep_stage_vec = [];
 
-    patientVec = 5:10; % ADJUST as needed which patient numbers are available
+    patientVec = 1:10; % ADJUST as needed which patient numbers are available
 
     for i=patientVec
         patient_number = sprintf("R%d", i);
