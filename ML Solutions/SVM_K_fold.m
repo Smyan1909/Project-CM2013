@@ -49,9 +49,9 @@ for i = 1:length(kernels)
         results(index).Model = svmModel;
         
 
-        fprintf('Configuration %d: Accuracy = %.2f%%\n', index, valAcc);
+        fprintf('Configuration %d: Accuracy = %.2f%%\n', index, valAcc*100);
     end
-end
+end 
 %% Best Configuration based on highest accuracy
 [maxAcc, maxIdx] = max([results.ValidationAccuracy]);
 bestParams = results(maxIdx);
