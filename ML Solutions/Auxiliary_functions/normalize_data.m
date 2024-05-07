@@ -24,5 +24,5 @@ function [train_data, val_data, test_data] = normalize_data(train_data, val_data
     % Normalize each dataset
     train_data = normalize_features(train_data, train_data, isContinuous, isBinary, percentageColumns);
     val_data = normalize_features(val_data, train_data, isContinuous, isBinary, percentageColumns);
-    test_data = normalize_features(test_data, train_data, isContinuous, isBinary, percentageColumns);
+    %test_data = normalize_features(test_data, train_data, isContinuous, isBinary, percentageColumns);
 end

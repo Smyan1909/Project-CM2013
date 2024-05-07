@@ -1,5 +1,6 @@
 %% Generate Feature Matrix
 [feat_mat, sleep_stage_vec] = create_feature_matrix();
+train_valid_patients = [1,2,3,4,5,6,7,8,9];
 
 %% Normalize features
 
@@ -7,57 +8,66 @@
 
 %% Feature selection using anova
 
-normalizedfeat_mat = feature_selection(normalizedfeat_mat, sleep_stage_vec, 60);
+normalizedfeat_mat = feature_selection(normalizedfeat_mat, sleep_stage_vec);
 
-%% Split the data into training data and test data by dividing for after patient 8
-x_train = normalizedfeat_mat(1:(numSamples - (1085+1083)),:);
-y_train = sleep_stage_vec(1:(numSamples - (1085+1083)));
-
-x_test = normalizedfeat_mat(((numSamples - (1085+1083))+1):numSamples, :);
-y_test = sleep_stage_vec(((numSamples - (1085+1083))+1):numSamples);
-
-%% Alternative randomly keep 20% of data as test data
-% Number of observations
-numObservations = size(normalizedfeat_mat, 1);
-
-% Create a random partition of data into training and test sets (80%-20%)
-c = cvpartition(numObservations, 'HoldOut', 0.20);
-
-% Indices for training and test sets
-trainIdx = training(c);
-testIdx = test(c);
-
-% Create training data
-x_train = normalizedfeat_mat(trainIdx, :);
-y_train = sleep_stage_vec(trainIdx);
-
-% Create test data
-x_test = normalizedfeat_mat(testIdx, :);
-y_test = sleep_stage_vec(testIdx);
 %% Train the KNN model
 % Setup cross-validation for parameter tuning
-bestK = 1;
-bestAcc = 0;
-for k = 1:20  % Test different k values
-    knnModel = fitcknn(x_train, y_train, 'NumNeighbors', k, 'CrossVal', 'on');
-    cvAcc = 1 - kfoldLoss(knnModel, 'LossFun', 'ClassifError');
-    if cvAcc > bestAcc
-        bestAcc = cvAcc;
-        bestK = k;
-    end
-end
-fprintf('Best K by cross-validation: %d with accuracy: %.2f%%\n', bestK, bestAcc * 100);
+results = struct();
+index = 0;
+for k=1:20
+        index = index + 1;
+        accuracies = zeros(length(train_valid_patients), 1);
 
-% Re-train with the best k
-knnModel = fitcknn(x_train, y_train, 'NumNeighbors', bestK);
-y_pred = predict(knnModel, x_test);
+        for j = 1:length(train_valid_patients)
+            fprintf('Processing data for patient %d...\n', train_valid_patients(j));
+            val_patients = [j];
+            train_patients = setdiff(train_valid_patients, val_patients);
+            test_patients = [];
+            % Splitting the data for training and testing (validation split is not used here)
+            [X_train_fold, Y_train_fold, X_valid_fold, Y_valid_fold, ~, ~] = split_data(normalizedfeat_mat, sleep_stage_vec, train_patients, val_patients, test_patients);
+            %[X_train_fold, X_valid_fold, ~] = preprocess_data(X_train_fold, X_valid_fold, [], true);
+            knnModel = fitcknn(X_train_fold, Y_train_fold, "NumNeighbors",k);
+
+            accuracies(j) = validate_model_rf(knnModel, X_valid_fold, Y_valid_fold); 
+            
+        end
+
+        avgAccuracy = mean(accuracies);
+        results(index).k = k;
+        
+        results(index).ValidationAccuracy = avgAccuracy;
+        fprintf('K= %d, Acc= %.2f%%', k, avgAccuracy*100);
+end
+%% choose params
+[maxAccuracy, maxIdx] = max([results.ValidationAccuracy]);
+bestParams = results(maxIdx);
+fprintf("%d\n", bestParams.k)
+%% Retrain the model
+[x_train, y_train, ~, ~, x_test, y_test] = split_data(feat_mat, sleep_stage_vec, 1:9,[],[10]);
+
+finalKNNModel = fitcknn(x_train, y_train, "NumNeighbors", k);
+
+%% Test on last patient
+y_pred = predict(finalKNNModel, x_test);
 y_pred = medfilt1(y_pred, 5);
+
 accuracy = sum(y_pred == y_test) / numel(y_test);
-fprintf('Optimized KNN Accuracy: %.2f%%\n', accuracy * 100);
-%% Plot the Confusion Matrix
+fprintf('Accuracy: %.2f%%\n', accuracy * 100);
+
 y_pred_cat = categorical(y_pred, [0,2,3,4,5], {'REM','N3','N2','N1','Wake'});
 y_test_cat = categorical(y_test, [0,2,3,4,5], {'REM','N3','N2','N1','Wake'});
 
+figure
 confusionchart(y_test_cat, y_pred_cat, 'RowSummary','row-normalized', ...
-            'ColumnSummary','column-normalized')
+           'ColumnSummary','column-normalized')
+
+figure
+plot(((1:length(y_test)))./2,y_test_cat)
+hold on
+plot(((1:length(y_pred)))./2,y_pred_cat)
+legend({"Annotated Data", "Predicted Data"})
+xlabel("Time [min]")
+ylabel("Sleep Stage")
+
+
 

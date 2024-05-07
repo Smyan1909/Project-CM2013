@@ -33,6 +33,7 @@ for i = 1:length(kernels)
             test_patients = [];
             % Splitting the data for training and testing (validation split is not used here)
             [X_train_fold, Y_train_fold, X_valid_fold, Y_valid_fold, ~, ~] = split_data(normalizedfeat_mat, sleep_stage_vec, train_patients, val_patients, test_patients);
+            %[X_train_fold, X_valid_fold, ~] = preprocess_data(X_train_fold, X_valid_fold, [], true);
             template = templateSVM('KernelFunction', kernel, 'KernelScale', 'auto', ...
                                    'BoxConstraint', boxConstraint, 'Standardize', true);
             svmModel = fitcecoc(X_train_fold, Y_train_fold, 'Learners', template, 'Coding', 'onevsone', ...
@@ -57,7 +58,7 @@ end
 bestParams = results(maxIdx);
 
 fprintf('Best configuration: Kernel = %s, BoxConstraint = %.2f, ValidationAccuracy = %.2f%%\n', ...
-        bestParams.Kernel, bestParams.BoxConstraint, bestParams.ValidationAccuracy);
+        bestParams.Kernel, bestParams.BoxConstraint, bestParams.ValidationAccuracy*100);
 %% Train the model with all 8 patients 
 
 [x_train, y_train, ~, ~, x_test, y_test] = split_data(normalizedfeat_mat, sleep_stage_vec, 1:9,[],[10]);
@@ -65,7 +66,7 @@ finalTemplate = templateSVM('KernelFunction', bestParams.Kernel, 'KernelScale','
     'BoxConstraint', bestParams.BoxConstraint, 'Standardize', true);
 finalSVMModel = fitcecoc(x_train, y_train, 'Learners',finalTemplate,'Coding','onevsone', ...
     'Verbose',2);
-%% Test the model on the remaining 2 patients
+%% Test the model on the remaining 1 patients
 y_pred = predict(finalSVMModel, x_test);
 y_pred = medfilt1(y_pred, 5);
 
