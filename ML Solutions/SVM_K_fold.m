@@ -1,6 +1,8 @@
 %% Generate Feature Matrix
 [feat_mat, sleep_stage_vec] = create_feature_matrix();
 train_valid_patients = [1,2,3,4,5,6,7,8,9];
+sleep_stage_vec(sleep_stage_vec == 1) = 2;
+
 
 %% Normalize features
 

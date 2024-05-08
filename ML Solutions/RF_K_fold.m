@@ -4,7 +4,8 @@
 % Split Data
 patientsSamples = [1083, 1078, 1048, 874, 1083, 1083, 918, 958, 1085, 1083]; % Number of samples per patient
 all_patients = [1,2,3,4,5,6,7,8,9];
-cumulativeSamples = [0, cumsum(patientsSamples)];    
+cumulativeSamples = [0, cumsum(patientsSamples)];
+sleep_stage_vec(sleep_stage_vec == 1) = 2;
 
 %% Random Forest Model Setup
 %numTrees = [100, 200, 500];  % Number of trees in the forest
