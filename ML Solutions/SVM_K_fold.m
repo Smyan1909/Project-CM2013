@@ -45,11 +45,13 @@ for i = 1:length(kernels)
         end
         
         valAcc = mean(accuracies);
+        valVarAcc = var(accuracies);
 
         results(index).ValidationAccuracy = valAcc;
         results(index).Kernel = kernel;
         results(index).BoxConstraint = boxConstraint;
         results(index).Model = svmModel;
+        results(index).AccuracyVariance = valVarAcc;
         
 
         fprintf('Configuration %d: Accuracy = %.2f%%\n', index, valAcc*100);

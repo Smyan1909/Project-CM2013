@@ -12,6 +12,7 @@ sleep_stage_vec(sleep_stage_vec == 1) = 2;
 numTrees = [500];
 maxNumSplits = [10]; % Maximum number of splits in each decision tree
 
+
 %% Patient-Based Cross-Validation
 fprintf('Setting up patient-based cross-validation...\n');
 
@@ -50,11 +51,13 @@ for nTrees = numTrees
         % Average OOB error and accuracy across all patient-specific folds
         avgOOBError = mean(oobErrors);
         avgAccuracy = mean(accuracies);
+        valVarAcc = var(accuracies);
         index = index + 1;
         results(index).numTrees = nTrees;
         results(index).maxNumSplits = numSplits;
         results(index).OOBError = avgOOBError;
         results(index).ValidationAccuracy = avgAccuracy;
+        results(index).AccuracyVariance = valVarAcc;
 
         fprintf('Configuration %d: Avg OOB Error = %.2f%%, Avg Accuracy = %.2f%%\n', index, avgOOBError * 100, avgAccuracy);
     end

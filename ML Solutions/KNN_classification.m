@@ -34,7 +34,9 @@ for k=1:20
         end
 
         avgAccuracy = mean(accuracies);
+        valVarAcc = var(accuracies);
         results(index).k = k;
+        results(index).AccuracyVariance = valVarAcc;
         
         results(index).ValidationAccuracy = avgAccuracy;
         fprintf('K= %d, Acc= %.2f%%', k, avgAccuracy*100);
