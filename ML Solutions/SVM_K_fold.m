@@ -46,12 +46,13 @@ for i = 1:length(kernels)
         
         valAcc = mean(accuracies);
         valVarAcc = var(accuracies);
+        stdAcc = std(accuracies);
 
         results(index).ValidationAccuracy = valAcc;
         results(index).Kernel = kernel;
         results(index).BoxConstraint = boxConstraint;
         results(index).Model = svmModel;
-        results(index).AccuracyVariance = valVarAcc;
+        results(index).StandardDeviation = stdAcc;
         
 
         fprintf('Configuration %d: Accuracy = %.2f%%\n', index, valAcc*100);
@@ -61,8 +62,8 @@ end
 [maxAcc, maxIdx] = max([results.ValidationAccuracy]);
 bestParams = results(maxIdx);
 
-fprintf('Best configuration: Kernel = %s, BoxConstraint = %.2f, ValidationAccuracy = %.2f%%\n', ...
-        bestParams.Kernel, bestParams.BoxConstraint, bestParams.ValidationAccuracy*100);
+fprintf('Best configuration: Kernel = %s, BoxConstraint = %.2f, ValidationAccuracy = %.2f%%, StandardDeviation = %.2f%%\n', ...
+        bestParams.Kernel, bestParams.BoxConstraint, bestParams.ValidationAccuracy*100, bestParams.StandardDeviation*100);
 %% Train the model with all 8 patients 
 
 [x_train, y_train, ~, ~, x_test, y_test] = split_data(normalizedfeat_mat, sleep_stage_vec, 1:9,[],[10]);

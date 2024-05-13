@@ -50,16 +50,19 @@ for nTrees = numTrees
 
         % Average OOB error and accuracy across all patient-specific folds
         avgOOBError = mean(oobErrors);
+        stdOOBError = std(oobErrors);
         avgAccuracy = mean(accuracies);
         valVarAcc = var(accuracies);
+        stdAcc = std(accuracies);
         index = index + 1;
         results(index).numTrees = nTrees;
         results(index).maxNumSplits = numSplits;
         results(index).OOBError = avgOOBError;
         results(index).ValidationAccuracy = avgAccuracy;
         results(index).AccuracyVariance = valVarAcc;
+        results(index).StandardDeviation = stdAcc;
 
-        fprintf('Configuration %d: Avg OOB Error = %.2f%%, Avg Accuracy = %.2f%%\n', index, avgOOBError * 100, avgAccuracy);
+        fprintf('Configuration %d: Avg OOB Error = %.2f%%, Avg Accuracy = %.2f%%, StandardDeviationAcc = %.2f%%, StandardDeviationOOB = %.2f%%\n', index, avgOOBError * 100, avgAccuracy * 100, stdAcc * 100, stdOOBError * 100);
     end
 end
 
