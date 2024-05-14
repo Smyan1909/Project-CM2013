@@ -1,4 +1,4 @@
-function [feat_mat, sleep_stage_vec, column_types] = create_feature_matrix(mat_filename_to_load_or_struct, fix_stage_1)
+function [feat_mat, sleep_stage_vec, feat_names, patient_IDs] = create_feature_matrix(mat_filename_to_load_or_struct, fix_stage_1)
 %CREATE_FEATURE_MATRIX This function creates the feature matrix and the
 %sleep stage vector.
 arguments
@@ -9,7 +9,7 @@ end
 if isstruct(mat_filename_to_load_or_struct)
     Patient_Data = mat_filename_to_load_or_struct;
 else
-    fprintf("create_feature_matrix : Loading Data from ""%s"" ...", mat_filename_to_load_or_struct);
+    fprintf("create_feature_matrix : Loading Data from ""%s"" ...\n", mat_filename_to_load_or_struct);
     load(mat_filename_to_load_or_struct, "Patient_Data");
 end
 
@@ -29,7 +29,8 @@ fprintf("create_feature_matrix : %d epochs (=rows) from patients: [%s]\n", total
 feat_names = feature_matrix_names(Patient_Data);
 
 feat_mat = zeros(totalEpochs, numel(feat_names));
-sleep_stage_vec = -1 * ones(totalEpochs, 1);
+sleep_stage_vec = -1 * ones(totalEpochs, 1, 'int32');
+patient_IDs = -1 * ones(totalEpochs, 1, 'int32');
 
 row_offset = 0;
 for i=patientNumbers
@@ -39,6 +40,8 @@ for i=patientNumbers
     pat_sleep_stage_vec = Patient_Data.(pat_num_str).sleep_stages(1:30:end);
     sleep_stage_vec(row_offset + 1 : row_offset + length(pat_sleep_stage_vec)) = ...
         pat_sleep_stage_vec;
+
+    patient_IDs(row_offset + 1 : row_offset + length(pat_sleep_stage_vec)) = i;
     
     for feat_i=1:numel(feat_names)
         fieldpath = split(feat_names{feat_i}, ".");
@@ -67,6 +70,7 @@ end
 % sleep_stage = Patient_Data.(patient_number).sleep_stages;
 %         sleep_stage = sleep_stage(1:30:length(sleep_stage)-1)';
 assert(~any(sleep_stage_vec == -1));
+assert(~any(patient_IDs == -1));
 
 if fix_stage_1 % due to outdated S1, S2, S3, S4 staging system (S3, S4 = N3)
     sleep_stage_vec(sleep_stage_vec == 1) = 2;
