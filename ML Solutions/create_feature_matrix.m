@@ -1,8 +1,9 @@
-function [feat_mat, sleep_stage_vec, column_types] = create_feature_matrix(mat_filename_to_load_or_struct)
+function [feat_mat, sleep_stage_vec, column_types] = create_feature_matrix(mat_filename_to_load_or_struct, fix_stage_1)
 %CREATE_FEATURE_MATRIX This function creates the feature matrix and the
-%sleep stage vector
+%sleep stage vector.
 arguments
     mat_filename_to_load_or_struct = "Feature_Extracted_Data.mat"
+    fix_stage_1 logical = true; % Whether to automatically replace outdated (S3, S4 = N3) sleep stages in sleep_stage_vec.
 end
 
 if isstruct(mat_filename_to_load_or_struct)
@@ -66,6 +67,10 @@ end
 % sleep_stage = Patient_Data.(patient_number).sleep_stages;
 %         sleep_stage = sleep_stage(1:30:length(sleep_stage)-1)';
 assert(~any(sleep_stage_vec == -1));
+
+if fix_stage_1 % due to outdated S1, S2, S3, S4 staging system (S3, S4 = N3)
+    sleep_stage_vec(sleep_stage_vec == 1) = 2;
+end
 
 end
 % 
