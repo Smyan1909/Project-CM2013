@@ -4,11 +4,11 @@ train_valid_patients = [1,2,3,4,5,6,7,8,9];
 
 %% Normalize features
 
-[normalizedfeat_mat, numSamples] = standardize_feature_table(feat_tab);
+norm_tab = standardize_feature_table(feat_tab);
 
 %% Feature selection using anova
 
-normalizedfeat_mat = feature_selection(normalizedfeat_mat, sleep_stage_vec);
+[subsel_tab, feat_pvals] = feature_selection_table(norm_tab, 0.05);
 
 %% Train the KNN model
 % Setup cross-validation for parameter tuning
