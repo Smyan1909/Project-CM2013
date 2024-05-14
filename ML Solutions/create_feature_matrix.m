@@ -1,8 +1,11 @@
-function [feat_mat, sleep_stage_vec] = create_feature_matrix()
+function [feat_mat, sleep_stage_vec, column_types] = create_feature_matrix(mat_filename_to_load)
     %CREATE_FEATURE_MATRIX This function creates the feature matrix and the
     %sleep stage vector
-    display("Loading Data ...")
-    load("Feature_Extracted_Data.mat", "Patient_Data");
+    arguments
+        mat_filename_to_load string = "Feature_Extracted_Data.mat"
+    end
+    fprintf("create_feature_matrix : Loading Data from ""%s"" ...", mat_filename_to_load);
+    load(mat_filename_to_load, "Patient_Data");
     
     numPatients = 10;
     numSignals = 6;
@@ -29,9 +32,9 @@ function [feat_mat, sleep_stage_vec] = create_feature_matrix()
 
         for k=1:numberOfEpochs-1
             feat_vec = [];
-            fprintf("Generating feature matrix patient R%d Epoch %d \n", i, k);
+            fprintf("Generating feature matrix for patient R%d, epoch %d \n", i, k);
             for j=1:numSignals
-                if j == 1
+                if j == 1 % EEG (primary)
                     feature_struct = Patient_Data.(patient_number).EEG_features;
                     
                     temporal_field_strID = sprintf("EEG_temporal_features_Epoch_%d", k);
@@ -67,7 +70,7 @@ function [feat_mat, sleep_stage_vec] = create_feature_matrix()
                     %new_feat = feature_struct.(binary_field).(binary_feat_string{1});
                     %feat_vec = [feat_vec, new_feat];
                     
-                elseif j == 2
+                elseif j == 2 % ECG
                     feature_struct = Patient_Data.(patient_number).ECG_features;
 
                     temporal_field_strID = sprintf("ECG_temporal_features_Epoch_%d", k);
@@ -89,7 +92,7 @@ function [feat_mat, sleep_stage_vec] = create_feature_matrix()
                         
                         feat_vec = [feat_vec, feature_struct.(hrv_field)];
     
-                elseif j == 3
+                elseif j == 3 % EEG_sec
                     feature_struct = Patient_Data.(patient_number).EEG_sec_features;
 
                     temporal_field_strID = sprintf("EEG_sec_temporal_features_Epoch_%d", k);
@@ -125,7 +128,7 @@ function [feat_mat, sleep_stage_vec] = create_feature_matrix()
                     %new_feat = feature_struct.(binary_field).(binary_feat_string{1});
                     %feat_vec = [feat_vec, new_feat];
     
-                elseif j == 4
+                elseif j == 4 % EMG
                     feature_struct = Patient_Data.(patient_number).EMG_features;
 
                     temporal_field_strID = sprintf("EMG_temporal_features_Epoch_%d", k);
@@ -144,7 +147,7 @@ function [feat_mat, sleep_stage_vec] = create_feature_matrix()
                     end
                     
     
-                elseif j == 5
+                elseif j == 5 % EOGR
                     feature_struct = Patient_Data.(patient_number).EOGR_features;
 
                     temporal_field_strID = sprintf("EOGR_temporal_features_Epoch_%d", k);
@@ -168,7 +171,7 @@ function [feat_mat, sleep_stage_vec] = create_feature_matrix()
                         new_feat = feature_struct.(visual_field_strID).(visual_feat_fieldnames{feat_i});
                         feat_vec = [feat_vec, new_feat];
                     end
-                elseif j == 6
+                elseif j == 6 % EOGL
                     feature_struct = Patient_Data.(patient_number).EOGL_features;
 
                     temporal_field_strID = sprintf("EOGL_temporal_features_Epoch_%d", k);
