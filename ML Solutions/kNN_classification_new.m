@@ -3,7 +3,7 @@ feat_tab = create_feature_table();
 train_valid_patients = [1,2,3,4,5,6,7,8,9];
 
 %% Normalize features
-
+sleep_stage_vec = table2array(feat_tab(:, end-1));
 norm_tab = standardize_feature_table(feat_tab);
 
 %% Feature selection using anova
@@ -24,7 +24,7 @@ for k=1:20
             train_patients = setdiff(train_valid_patients, val_patients);
             test_patients = [];
             % Splitting the data for training and testing (validation split is not used here)
-            [X_train_fold, Y_train_fold, X_valid_fold, Y_valid_fold, ~, ~] = split_data(normalizedfeat_mat, sleep_stage_vec, train_patients, val_patients, test_patients);
+            [X_train_fold, Y_train_fold, X_valid_fold, Y_valid_fold, ~, ~] = split_data(subsel_tab, sleep_stage_vec, train_patients, val_patients, test_patients);
             %[X_train_fold, X_valid_fold, ~] = preprocess_data(X_train_fold, X_valid_fold, [], true);
             knnModel = fitcknn(X_train_fold, Y_train_fold, "NumNeighbors",k);
 
@@ -43,15 +43,15 @@ end
 %% choose params
 [maxAccuracy, maxIdx] = max([results.ValidationAccuracy]);
 bestParams = results(maxIdx);
-fprintf("%d\n", bestParams.k)
+fprintf("Best Configuration k = %d, ValidationAccuracy = %.2f%%, StandardDeviation = %.2f%%\n", bestParams.k, bestParams.ValidationAccuracy*100, sqrt(bestParams.AccuracyVariance)*100)
 %% Retrain the model
-[x_train, y_train, ~, ~, x_test, y_test] = split_data(feat_mat, sleep_stage_vec, 1:9,[],[10]);
+[x_train, y_train, ~, ~, x_test, y_test] = split_data(subsel_tab, sleep_stage_vec, 1:9,[],[10]);
 
-finalKNNModel = fitcknn(x_train, y_train, "NumNeighbors", k);
+finalKNNModel = fitcknn(x_train, y_train, "NumNeighbors", bestParams.k);
 
 %% Test on last patient
 y_pred = predict(finalKNNModel, x_test);
-y_pred = medfilt1(y_pred, 5);
+y_pred = medfilt1(double(y_pred), 5);
 
 accuracy = sum(y_pred == y_test) / numel(y_test);
 fprintf('Accuracy: %.2f%%\n', accuracy * 100);
