@@ -9,7 +9,7 @@ sleep_stage_vec(sleep_stage_vec == 1) = 2;
 
 %% Feature selection using anova
 
-normalizedfeat_mat = feature_selection(normalizedfeat_mat, sleep_stage_vec);
+[normalizedfeat_mat, feature_idx] = feature_selection(normalizedfeat_mat, sleep_stage_vec);
 
 %% Train the KNN model
 % Setup cross-validation for parameter tuning

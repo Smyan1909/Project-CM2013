@@ -1,4 +1,4 @@
-function cleaned_feature_matrix = feature_selection(normalizedfeat_mat, sleep_stage_vec)
+function [cleaned_feature_matrix, feature_idx] = feature_selection(normalizedfeat_mat, sleep_stage_vec)
 %FEATURE_SELECTION selects top numFeatures features using ANOVA
     dims = size(normalizedfeat_mat);
     p_values = zeros(1, dims(2));
