@@ -79,7 +79,20 @@ bestParams = results(minIdx);
 
 finalRFModel = TreeBagger(bestParams.numTrees, x_train, y_train, 'Method', 'classification', ...
                                  'NumPredictorsToSample', 'all', 'MinLeafSize', bestParams.maxNumSplits, ...
-                                 'OOBPrediction', 'on');
+                                 'OOBPrediction', 'on', 'OOBPredictorImportance','on');
+
+%% Plotting the Feature Importance using the RF framework
+[sortedImportance, sortedIndices] = sort(featureImportance, 'descend');
+top10Indices = sortedIndices(1:10);
+top10Importance = sortedImportance(1:10);
+
+bar(top10Importance);
+xlabel('Features');
+ylabel('Importance Score');
+title('Top 10 Important Features');
+
+set(gca, 'XTick', 1:10, 'XTickLabel', {"WL EEG\_sec", "MAV EEG", "Activity EOGR", "Activity EEG\_sec", "WL EMG", "Mobility EEG\_sec",...
+    "MAV EMG", "MAV EOGL", "Activity EEG", "Delta Wave % EEG"})
 
 %% Test the Model
 y_pred = predict(finalRFModel, x_test);

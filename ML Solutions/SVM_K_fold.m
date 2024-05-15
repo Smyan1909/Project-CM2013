@@ -9,7 +9,8 @@ sleep_stage_vec(sleep_stage_vec == 1) = 2;
 [normalizedfeat_mat, numSamples] = create_normalized_matrix(feat_mat);
 %% Feature Selection Using ANOVA
 
-normalizedfeat_mat = feature_selection(normalizedfeat_mat, sleep_stage_vec);
+[normalizedfeat_mat, feature_idx] = feature_selection(normalizedfeat_mat, sleep_stage_vec);
+
 
 %% Patient based cross validation
 
