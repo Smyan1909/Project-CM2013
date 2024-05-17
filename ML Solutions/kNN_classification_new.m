@@ -1,9 +1,10 @@
 %% Generate Feature Matrix
 feat_tab = create_feature_table();
-train_valid_patients = [1,2,3,4,5,6,7,8,9];
+train_test_patients = [1,2,3,4,5,6,7,8,9];
+final_patients = [10];
 
 %% Normalize features
-sleep_stage_vec = table2array(feat_tab(:, end-1));
+
 norm_tab = standardize_feature_table(feat_tab);
 
 %% Feature selection using anova
@@ -12,61 +13,86 @@ norm_tab = standardize_feature_table(feat_tab);
 
 %% Train the KNN model
 % Setup cross-validation for parameter tuning
+
 results = struct();
-index = 0;
-for k=1:20
-        index = index + 1;
-        accuracies = zeros(length(train_valid_patients), 1);
+ks = 1:20;
+dist_metrics = string({'chebychev', 'cityblock', 'correlation', 'cosine', 'euclidean', 'hamming', ...
+    'jaccard', 'minkowski', 'seuclidean', 'spearman'});
+confs = combinations(dist_metrics, ks);
 
-        for j = 1:length(train_valid_patients)
-            fprintf('Processing data for patient %d...\n', train_valid_patients(j));
-            val_patients = [j];
-            train_patients = setdiff(train_valid_patients, val_patients);
-            test_patients = [];
-            % Splitting the data for training and testing (validation split is not used here)
-            [X_train_fold, Y_train_fold, X_valid_fold, Y_valid_fold, ~, ~] = split_data(subsel_tab, sleep_stage_vec, train_patients, val_patients, test_patients);
-            %[X_train_fold, X_valid_fold, ~] = preprocess_data(X_train_fold, X_valid_fold, [], true);
-            knnModel = fitcknn(X_train_fold, Y_train_fold, "NumNeighbors",k);
+for confNo = 1:height(confs)
+    fprintf("Testing configuration %d of %d\n", confNo, height(confs));
+    accuracies = zeros(length(train_test_patients), 1);
 
-            accuracies(j) = validate_model_rf(knnModel, X_valid_fold, Y_valid_fold); 
-            
-        end
+    for j = 1:length(train_test_patients) % cross-validation in training
+        %fprintf('Patient %d is test, all others are train\n', train_test_patients(j));
+        test_patients = [train_test_patients(j)];
+        train_patients = setdiff(train_test_patients, test_patients);
 
-        avgAccuracy = mean(accuracies);
-        valVarAcc = var(accuracies);
-        results(index).k = k;
-        results(index).AccuracyVariance = valVarAcc;
+        % Splitting the data for training and testing (validation split is not used here)
         
-        results(index).ValidationAccuracy = avgAccuracy;
-        fprintf('K= %d, Acc= %.2f%%', k, avgAccuracy*100);
-end
-%% choose params
-[maxAccuracy, maxIdx] = max([results.ValidationAccuracy]);
-bestParams = results(maxIdx);
-fprintf("\nBest Configuration k = %d, ValidationAccuracy = %.2f%%, StandardDeviation = %.2f%%\n", bestParams.k, bestParams.ValidationAccuracy*100, sqrt(bestParams.AccuracyVariance)*100)
-%% Retrain the model
-[x_train, y_train, ~, ~, x_test, y_test] = split_data(subsel_tab, sleep_stage_vec, 1:9,[],[10]);
 
-finalKNNModel = fitcknn(x_train, y_train, "NumNeighbors", bestParams.k);
+        X_train_fold = subsel_tab(subsel_tab.patient_ID ~= test_patients(1), 1:end-2);
+        Y_train_fold = subsel_tab.sleep_stage(subsel_tab.patient_ID ~= test_patients(1));
+
+        knnModel = fitcknn(X_train_fold, Y_train_fold, ...
+            "NumNeighbors", confs.ks(confNo), ...
+            "Distance", confs.dist_metrics(confNo) ...
+        );
+
+        X_test_fold = subsel_tab(subsel_tab.patient_ID == test_patients(1), 1:end-2);
+        Y_test_fold = subsel_tab.sleep_stage(subsel_tab.patient_ID == test_patients(1));
+        
+        pred_labels = predict(knnModel, X_test_fold);
+        accuracies(j) = mean(pred_labels == Y_test_fold);
+    end
+
+    results(confNo).k = confs.ks(confNo);
+    results(confNo).Accuracy = mean(accuracies);
+    results(confNo).AccuracyVariance = var(accuracies);  
+    %fprintf('K= %d, Acc= %.2f%%\n', k, avgAccuracy*100);
+end
+
+result_tab = struct2table(results);
+result_tab.index = transpose(1:height(result_tab));
+%% choose params
+
+result_tab_by_acc = sortrows(result_tab, "Accuracy", "descend");
+confNo_optimal = result_tab_by_acc.index(1);
+best_params = table2struct(confs(confNo_optimal, :));
+
+%% Retrain the model
+final_fold_train = subsel_tab(~ismember(subsel_tab.patient_ID, final_patients), :);
+
+final_kNN_model = fitcknn( ...
+    final_fold_train(:, 1:end-2), ...
+    final_fold_train.sleep_stage, ...
+    "NumNeighbors", best_params.ks, ...
+    "Distance", best_params.dist_metrics ...
+    );
 
 %% Test on last patient
-y_pred = predict(finalKNNModel, x_test);
-y_pred = medfilt1(double(y_pred), 5);
+final_fold_test = subsel_tab(ismember(subsel_tab.patient_ID, final_patients), :);
 
-accuracy = sum(y_pred == y_test) / numel(y_test);
-fprintf('Accuracy: %.2f%%\n', accuracy * 100);
+final_y_pred = predict(final_kNN_model, final_fold_test(:, 1:end-2));
+[final_y_pred_sus, final_y_pred] = classify_suspect_stages(y_pred);
 
-y_pred_cat = categorical(y_pred, [0,2,3,4,5], {'REM','N3','N2','N1','Wake'});
-y_test_cat = categorical(y_test, [0,2,3,4,5], {'REM','N3','N2','N1','Wake'});
+final_y_true = final_fold_test.sleep_stage;
+accuracy = mean(final_y_pred == final_y_true);
+fprintf('Final accuracy: %.2f%%\n', accuracy * 100);
+
+%%
+y_pred_cat = categorical(final_y_pred, [0,2,3,4,5], {'REM','N3','N2','N1','Wake'});
+y_true_cat = categorical(final_y_true, [0,2,3,4,5], {'REM','N3','N2','N1','Wake'});
 
 figure
-confusionchart(y_test_cat, y_pred_cat, 'RowSummary','row-normalized', ...
+confusionchart(y_true_cat, y_pred_cat, 'RowSummary','row-normalized', ...
            'ColumnSummary','column-normalized')
 
 figure
-plot(((1:length(y_test)))./2,y_test_cat)
+plot(((1:length(final_y_true)))./2,y_true_cat)
 hold on
-plot(((1:length(y_pred)))./2,y_pred_cat)
+plot(((1:length(final_y_pred)))./2,y_pred_cat)
 legend({"Annotated Data", "Predicted Data"})
 xlabel("Time [min]")
 ylabel("Sleep Stage")
