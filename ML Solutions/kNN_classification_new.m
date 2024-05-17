@@ -43,7 +43,7 @@ end
 %% choose params
 [maxAccuracy, maxIdx] = max([results.ValidationAccuracy]);
 bestParams = results(maxIdx);
-fprintf("Best Configuration k = %d, ValidationAccuracy = %.2f%%, StandardDeviation = %.2f%%\n", bestParams.k, bestParams.ValidationAccuracy*100, sqrt(bestParams.AccuracyVariance)*100)
+fprintf("\nBest Configuration k = %d, ValidationAccuracy = %.2f%%, StandardDeviation = %.2f%%\n", bestParams.k, bestParams.ValidationAccuracy*100, sqrt(bestParams.AccuracyVariance)*100)
 %% Retrain the model
 [x_train, y_train, ~, ~, x_test, y_test] = split_data(subsel_tab, sleep_stage_vec, 1:9,[],[10]);
 
